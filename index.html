@@ -81,6 +81,14 @@
       };
       pair.appendChild(arrBtn);
 
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "Add Field to Component #";
+      addBtn.onclick = (event) => {
+        createPair(parent, isArray);
+      }
+
+      pair.appendChild(addBtn);
+
       if (!first) {
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "x";
@@ -100,6 +108,32 @@
       container.appendChild(brk);
     }
 
+
+    // returns true if last pair of inputs in a div is empty
+    // event is an event in any of the inputs of the div, such as keyup
+    function lastPairIsEmpty(event) {
+      console.log('triggered = ' + $(event.target).val());
+      const div = $(event.target).parent().parent(); 
+      console.log('html = ' + div.html());
+
+      const lastPair = div.find('div.pair').last();
+      console.log('last pair = ' + lastPair.html())
+
+      const lastInputs = lastPair.find('input');
+
+      const values = lastInputs.map((i, el) => {
+        return $(el).val().trim();   // get the input value
+      }).get();  // .get() converts the jQuery-wrapped collection into a plain array
+
+      if (values.join('') == '') {
+        return true
+      }
+
+      return false
+      
+    }
+
+  
     function addControls(container, isArray) {
       
       //const label = document.createElement('label');
@@ -107,7 +141,9 @@
       //container.appendChild(label);
       const addBtn = document.createElement("button");
       addBtn.textContent = "Add Field to Component #";
-      addBtn.onclick = () => createPair(container, isArray);
+      addBtn.onclick = (event) => {
+        createPair(container, isArray);
+      }
       container.appendChild(addBtn);
       addEmptyParagraph(container);      
     }
@@ -182,6 +218,15 @@ $(document).ready(function() {
     generateJSON();
     //alert('change!');
   });
+
+  $(document).on('keyup', 'input', (event) => {
+    const div = $(event.target).parent().parent();
+    if (lastPairIsEmpty(event)) {
+       div.find('button').prop('disabled', true);
+    } else {
+      div.find('button').prop('disabled', false)
+    }
+  })
 
   $('button:eq(1)').click();
   $('button:first').click();
