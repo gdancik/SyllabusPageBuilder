@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JSON Builder</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .object, .array { border-left: 2px solid #ccc; margin-left: 20px; padding-left: 10px; }
+    .pair { margin-bottom: 6px; }
+    input { margin-right: 5px; }
+    button { margin-left: 5px; }
+    textarea { width: 100%; height: 200px; margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <h1>JSON Builder</h1>
+  <h3> Contents of Page: </h3>
+
+
+  <div id="editor" class="object"></div>
+  <hr>
+</br>
+
+  <!-- <button onclick="generateJSON()">Generate JSON</button> -->
+
+  <h2>Output</h2>
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    function createPair(parent, isArray=false) {
+      const pair = document.createElement("div");
+      pair.className = "pair";
+
+      if (!isArray) {
+        const keyInput = document.createElement("input");
+        keyInput.placeholder = "key";
+        pair.appendChild(keyInput);
+      }
+
+      const valueInput = document.createElement("input");
+      valueInput.placeholder = "value";
+      pair.appendChild(valueInput);
+
+      
+      const objBtn = document.createElement("button");
+      objBtn.textContent = "+Object";
+      objBtn.onclick = () => {
+        valueInput.remove();
+        objBtn.remove();
+        arrBtn.remove();
+        const child = document.createElement("div");
+        child.className = "object";
+        addControls(child, false);
+        pair.appendChild(child);
+      };
+      pair.appendChild(objBtn);
+      
+
+      const arrBtn = document.createElement("button");
+      arrBtn.textContent = "+Array";
+      arrBtn.onclick = () => {
+        valueInput.remove();
+        objBtn.remove();
+        arrBtn.remove();
+        const child = document.createElement("div");
+        child.className = "array";
+        addArrayControls(child);
+        pair.appendChild(child);
+      };
+      pair.appendChild(arrBtn);
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "x";
+      removeBtn.onclick = () => {
+        pair.remove();
+        generateJSON();
+      }
+
+      pair.appendChild(removeBtn);
+
+      parent.appendChild(pair);
+    }
+
+    function addControls(container, isArray) {
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "Add Field";
+      addBtn.onclick = () => createPair(container, isArray);
+      container.appendChild(addBtn);
+      const brk = document.createElement("p");
+      //brk.textContent = "hello, how are you?";
+      container.appendChild(brk);
+    }
+
+    function addArrayControls(container) {
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "+Object";
+      addBtn.onclick = () => {
+        const objWrapper = document.createElement("div");
+        objWrapper.className = "object";
+        addControls(objWrapper, false);
+        container.appendChild(objWrapper);
+      };
+      container.appendChild(addBtn);
+    }
+
+    function parseContainer(container, isArray=false) {
+      const obj = isArray ? [] : {};
+      const pairs = container.querySelectorAll(":scope > .pair");
+      const objects = container.querySelectorAll(":scope > .object");
+
+      if (isArray) {
+        objects.forEach(childObj => {
+          obj.push(parseContainer(childObj, false));
+        });
+      } else {
+        pairs.forEach(pair => {
+          const inputs = pair.querySelectorAll(":scope > input");
+          const childObj = pair.querySelector(":scope > .object, :scope > .array");
+          let key, value;
+
+          key = inputs[0]?.value;
+          if (!key) return; // skip empty keys
+          if (childObj) {
+            value = parseContainer(childObj, childObj.classList.contains("array"));
+          } else {
+            value = parseValue(inputs[1]?.value);
+          }
+          obj[key] = value;
+        });
+      }
+
+      return obj;
+    }
+
+    function parseValue(val) {
+      if (val === "true") return true;
+      if (val === "false") return false;
+      if (!isNaN(val) && val.trim() !== "") return Number(val);
+      return val;
+    }
+
+    function generateJSON() {
+      const root = document.getElementById("editor");
+      const json = parseContainer(root, false);
+      document.getElementById("output").value = JSON.stringify(json, null, 2);
+    }
+
+    // initialize
+    addControls(document.getElementById("editor"), false);
+
+$(document).ready(function() {
+  //alert('ready');
+  $(document).on('keyup', 'input', function() {
+    generateJSON();
+    //alert('change!');
+  });
+});
+
+  </script>
+</body>
+</html>
+
