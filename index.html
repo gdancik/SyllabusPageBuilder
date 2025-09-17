@@ -7,11 +7,18 @@
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     .object, .array { 
-      border: 2px solid #ccc; 
+      #border: 2px solid #ccc; 
       margin-left: 20px; 
-      padding-left: 10px;
+      padding: 10px;
       margin-top:10px;
       margin-bottom:10px;
+     }
+     .object {
+      border-left: 2px solid darkgreen; 
+     }
+
+     .array {
+      border: 2px solid purple;
      }
     .pair { margin-bottom: 6px; }
     input { margin-right: 5px; }
@@ -69,11 +76,12 @@
       
 
       const arrBtn = document.createElement("button");
-      arrBtn.textContent = "Value is List";
+      arrBtn.textContent = "Add Content";
       arrBtn.onclick = () => {
         valueInput.remove();
         objBtn.remove();
         arrBtn.remove();
+        pair.querySelector('input').value = 'content'
         const child = document.createElement("div");
         child.className = "array";
         addArrayControls(child);
@@ -81,19 +89,23 @@
       };
       pair.appendChild(arrBtn);
 
-      const addBtn = document.createElement("button");
-      addBtn.textContent = "Add Field to Component #";
-      addBtn.onclick = (event) => {
-        createPair(parent, isArray);
+      if (!first) {
+        const addBtn = document.createElement("button");
+        addBtn.textContent = "Add Field";
+        addBtn.disabled = true;
+        addBtn.onclick = (event) => {
+          createPair(parent, isArray);
       }
 
       pair.appendChild(addBtn);
-
-      if (!first) {
         const removeBtn = document.createElement("button");
         removeBtn.textContent = "x";
         removeBtn.onclick = () => {
+          p = pair.parentElement;          
           pair.remove();
+          if (p.querySelectorAll('input').length == 0) {
+            p.remove();
+          }
           generateJSON();
         }
 
@@ -135,7 +147,8 @@
 
   
     function addControls(container, isArray) {
-      
+      createPair(container, isArray);
+      return;
       //const label = document.createElement('label');
       //label.textContent ='Component';
       //container.appendChild(label);
@@ -157,9 +170,10 @@
         objWrapper.className = "object";
         addControls(objWrapper, false);
         container.appendChild(objWrapper);
-        //for (var i = 0; i < 4; i++) {
-        //  container.getElementsByTagName('button')[1].click();
-        //}
+        container.querySelector('input').value = 'type';
+        container.querySelectorAll('input')[1].focus();
+        generateJSON()
+
       };
       container.appendChild(addBtn);
       addEmptyParagraph(container);
@@ -220,11 +234,11 @@ $(document).ready(function() {
   });
 
   $(document).on('keyup', 'input', (event) => {
-    const div = $(event.target).parent().parent();
+    const div = $(event.target).parent();
     if (lastPairIsEmpty(event)) {
-       div.find('button').prop('disabled', true);
+       div.find('button').eq(2).prop('disabled', true);
     } else {
-      div.find('button').prop('disabled', false)
+      div.find('button').eq(2).prop('disabled', false)
     }
   })
 
