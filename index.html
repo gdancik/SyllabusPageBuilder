@@ -117,7 +117,7 @@
         el.find('.pair').removeClass('hide');
       }
     }
-  
+
     // returns true if last pair of inputs in a div is empty
     // event is an event in any of the inputs of the div, such as keyup
     function lastPairIsEmpty(event) {
@@ -197,25 +197,27 @@
       collapseBtn.onclick = (e) => {
         if (e.target.innerText == "Collapse") {            
             $(e.target.parentElement).find('.pair').addClass('hide');
-            e.target.innerText = "Expand";
-
-            $(e.target.parentElement).find("div.object").each(function(i,e) {
-                let mytype = 'Component(Unknown type) (-)';  
-                $(this).find("div.pair input").each(function() {
-                  if ($(this).val() == "type") {
-                    mytype = (($(this).next().val()));  
-                    if (mytype == '') {
-                      mytype = 'Unknown Type';
-                    }
-                  }
-                })
-                if (mytype != '') {            
-                  $(e).find("button.component_header").text('Component (' + mytype +') (-)')                                     
-                }
-            });
+            e.target.innerText = "Expand";     
+            $(e.target.parentElement).find('button.component_header').each(
+              function(i,e) {
+                const txt = e.innerHTML;
+                if (txt.endsWith('(-)')) {
+                  e.innerHTML = txt.replace('(-)', '(+)');
+                }                
+              }
+            );
+            
         } else {
           $(e.target.parentElement).find('.pair').removeClass('hide');
           e.target.innerText = "Collapse";
+          $(e.target.parentElement).find('button.component_header').each(
+              function(i,e) {
+                const txt = e.innerHTML;
+                if (txt.endsWith('(+)')) {
+                  e.innerHTML = txt.replace('(+)', '(-)');
+                }                
+              }
+            );
         }
       }
       container.appendChild(collapseBtn);
