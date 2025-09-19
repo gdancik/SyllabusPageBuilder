@@ -18,6 +18,9 @@
   <textarea id="output" readonly></textarea>
 
   <script>
+
+    
+
     function createPair(parent, isArray=false, first = false) {
       const pair = document.createElement("div");
       pair.className = "pair";
@@ -106,7 +109,15 @@
       container.appendChild(brk);
     }
 
-
+    // hide/show all .pairs in el, which is a jQuery div.object
+    function toggleHidePairs(el, type) {
+      if (type == 'hide') {
+        el.find('.pair').addClass('hide');
+      } else {
+        el.find('.pair').removeClass('hide');
+      }
+    }
+  
     // returns true if last pair of inputs in a div is empty
     // event is an event in any of the inputs of the div, such as keyup
     function lastPairIsEmpty(event) {
@@ -156,8 +167,20 @@
         objWrapper.className = "object";
 
         const collapse = document.createElement("button");
-        collapse.textContent = "New component";
+        collapse.textContent = "New component (-)";
         collapse.className = "component_header";        
+
+        collapse.onclick = (e) => {
+            const btn_text = e.target.innerHTML;
+            if (btn_text.endsWith('(-)')) {             
+              toggleHidePairs($(e.target.parentElement), "hide");
+              e.target.innerHTML = btn_text.replace('(-)','(+)');
+            } else {
+              toggleHidePairs($(e.target.parentElement), "show");
+              e.target.innerHTML = btn_text.replace('(+)','(-)');
+            }
+        };
+
         objWrapper.appendChild(collapse);
 
         //addControls(objWrapper, false);
@@ -177,18 +200,17 @@
             e.target.innerText = "Expand";
 
             $(e.target.parentElement).find("div.object").each(function(i,e) {
-                let mytype = 'Component(Unknown type)';  
+                let mytype = 'Component(Unknown type) (-)';  
                 $(this).find("div.pair input").each(function() {
-                  console.log('hi');
                   if ($(this).val() == "type") {
-                    mytype = (($(this).next().val()))  
+                    mytype = (($(this).next().val()));  
                     if (mytype == '') {
                       mytype = 'Unknown Type';
                     }
                   }
                 })
                 if (mytype != '') {            
-                  $(e).find("button.component_header").text('Component (' + mytype +')')                                     
+                  $(e).find("button.component_header").text('Component (' + mytype +') (-)')                                     
                 }
             });
         } else {
@@ -265,7 +287,9 @@ $(document).ready(function() {
     if ($(event.target).prev().val() == 'type') {
       let v = $(event.target).val();
       if (v == '') {
-        v = 'Component (unknown type)';
+        v = 'Component (unknown type) (-)';
+      } else {
+        v += ' (-)';
       }
       div.parent().find('button.component_header').html(v);
     }
