@@ -7,19 +7,42 @@
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-  <h1>Syllabus Page Builder</h1>
-  <div id="editor" class="object"></div>
-  <hr>
-</br>
+
+<div class="tab">
+  <button id = 'btnBuilder' class="tablinks active" onclick="openTab(event, 'Builder')">Builder</button>
+  <button id = 'btnJSON' class="tablinks" onclick="openTab(event, 'JSON')">JSON</button>  
+</div>
+
+  <div id = "editor-container">
+    <h1>Syllabus Page Builder</h1>
+    <div id="editor" class="object"></div>
+  </div>
 
   <!-- <button onclick="generateJSON()">Generate JSON</button> -->
 
-  <h2>JSON format</h2>
-  <textarea id="output" readonly></textarea>
-
+  <div id = 'output-container'>
+    <h1>JSON format</h1>
+    <textarea id="output" readonly></textarea>
+  </div>
+  
   <script>
+  
+    function openTab(e, tab) {
 
-    
+     
+
+      if (tab == "Builder") {
+        $('#output-container').hide();
+        $('#editor-container').show();
+        $('#btnBuilder').addClass('active');
+        $('#btnJSON').removeClass('active');
+      } else {
+        $('#editor-container').hide();
+        $('#output-container').show();        
+        $('#btnJSON').addClass('active');
+        $('#btnBuilder').removeClass('active');
+      }
+    }
 
     function createPair(parent, isArray=false, first = false) {
       const pair = document.createElement("div");
@@ -39,7 +62,7 @@
       pair.appendChild(valueInput);
 
     
-      /***/
+      /***
       const objBtn = document.createElement("button");
       objBtn.textContent = "Value is Object";
       objBtn.disabled = true;
@@ -53,15 +76,13 @@
         pair.appendChild(child);
       };
       pair.appendChild(objBtn);
-
-      /****/
+      **/
       
-
       const arrBtn = document.createElement("button");
-      arrBtn.textContent = "Add Content";
+      arrBtn.textContent = "Content";
       arrBtn.onclick = () => {
         valueInput.remove();
-        objBtn.remove();
+        //objBtn.remove();
         arrBtn.remove();
         pair.querySelector('input').value = 'content'
         const child = document.createElement("div");
@@ -74,7 +95,7 @@
       if (!first) {
         const addBtn = document.createElement("button");
         addBtn.textContent = "Add Field";
-        addBtn.disabled = true;
+        addBtn.disabled = false;
         addBtn.onclick = (event) => {
           createPair(parent, isArray);
       }
@@ -280,12 +301,18 @@ $(document).ready(function() {
 
   $(document).on('keyup', 'input', (event) => {    
     const div = $(event.target).parent();
-    if (lastPairIsEmpty(event)) {
-       div.find('button').eq(2).prop('disabled', true);
-    } else {
-      div.find('button').eq(2).prop('disabled', false)
-    }
 
+    // enable Add Field only if last last pair if filled
+    /***
+    if (lastPairIsEmpty(event)) {
+       div.find('button').eq(1).prop('disabled', true);
+    } else {
+      div.find('button').eq(1).prop('disabled', false)
+    }
+    ***/
+
+    let typeval = 'Component (-)';
+    // update component button text based on type (id)
     if ($(event.target).prev().val() == 'type') {
       let v = $(event.target).val();
       if (v == '') {
@@ -298,8 +325,8 @@ $(document).ready(function() {
 
   })
 
-  $('button:eq(1)').click();
-  $('button:first').click();
+  $('button:eq(2)').click();
+  $('button:eq(2)').click();
   generateJSON();
 });
 
